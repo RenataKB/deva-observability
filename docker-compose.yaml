@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  app:
+    image: ada-deva-observabitity
+    container_name: app
+    ports:
+      - 5000:5000
