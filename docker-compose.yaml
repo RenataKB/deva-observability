@@ -6,6 +6,12 @@ services:
     container_name: app
     ports:
       - 5000:5000
+  
+  app-client:
+    image: ada-app-client
+    container_name: app-client
+    depends_on:
+      - app
 
   prometheus:
     image: prom/prometheus
@@ -34,6 +40,8 @@ services:
     image: grafana/grafana
     ports:
       - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
     container_name: grafana
     depends_on:
       - prometheus
