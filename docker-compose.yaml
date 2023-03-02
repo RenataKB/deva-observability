@@ -6,6 +6,13 @@ services:
     container_name: app
     ports:
       - 5000:5000
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "tcp://192.168.15.16:12201"
+        tag: ada
+    depends_on:
+      - graylog
   
   app-client:
     image: ada-app-client
