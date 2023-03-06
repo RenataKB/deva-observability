@@ -6,53 +6,97 @@ from prometheus_flask_exporter import PrometheusMetrics
 import prometheus_client as prom
 import logging
 
-# configure the logger
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
-quantidade_usuarios_online = prom.Gauge("quantidade_usuarios_online", "Número de usuarios online no momento")
+quantidade_usuarios_online = prom.Gauge(
+    "quantidade_usuarios_online", "Número de usuarios online no momento"
+)
 
 
 def parametros_endpoint():
-    time.sleep(random.randint(1,10))
-    quantidade_usuarios_online.set(random.randint(1,100))
+    time.sleep(random.randint(1, 10))
+    quantidade_usuarios_online.set(random.randint(1, 100))
 
 
-@app.route('/renda-fixa')
-# @metrics.counter('efetivacao_renda_fixa', 'Numero de papeis de renda fixa efetivados', labels={'tipo': 'RENDA FIXA'})
+# Deixei apenas no renda-fixa e no cripto, para nao gerar tanto erro
+def pagina_ou_erro(nome_pag):
+    app.logger.info(f"Acessando {nome_pag}!")
+    if random.choice([True, False]):
+        app.logger.error(
+            "%s %s %s %s",
+            request.remote_addr,
+            request.method,
+            request.scheme,
+            request.full_path,
+        )
+        http.client.BAD_REQUEST
+        return render_template("mensagem_erro.html"), 500
+    app.logger.info(
+        "%s %s %s %s",
+        request.remote_addr,
+        request.method,
+        request.scheme,
+        request.full_path,
+    )
+    return render_template("lista.html", titulo=nome_pag)
+
+
+@app.route("/")
+def index():
+    app.logger.info(
+        "%s %s %s %s",
+        request.remote_addr,
+        request.method,
+        request.scheme,
+        request.full_path,
+    )
+    return render_template("index.html")
+
+
+@app.route("/renda-fixa")
 def renda_fixa():
-    app.logger.info("Acessando Renda Fixa!")
-    app.logger.info('%s %s %s %s', request.remote_addr, request.method, request.scheme, request.full_path)
     parametros_endpoint()
-    if random.randint(0, 1):
-        return http.client.BAD_REQUEST
-    return render_template('lista.html', titulo="Renda Fixa")
+    return pagina_ou_erro("Renda Fixa")
 
 
-@app.route('/renda-variavel')
+@app.route("/renda-variavel")
 def renda_variavel():
-    app.logger.info('%s %s %s %s', request.remote_addr, request.method, request.scheme, request.full_path)
     parametros_endpoint()
-    return render_template('lista.html', titulo="Renda Variável")
+    app.logger.info(
+        "%s %s %s %s",
+        request.remote_addr,
+        request.method,
+        request.scheme,
+        request.full_path,
+    )
+    return render_template("lista.html", titulo="Renda Variável")
 
 
-@app.route('/fii')
+@app.route("/fii")
 def fii():
-    app.logger.info('%s %s %s %s', request.remote_addr, request.method, request.scheme, request.full_path)
     parametros_endpoint()
-    return render_template('lista.html', titulo="Fundo de Investimento Imobiliário")
+    app.logger.info(
+        "%s %s %s %s",
+        request.remote_addr,
+        request.method,
+        request.scheme,
+        request.full_path,
+    )
+    return render_template("lista.html", titulo="Fundo de Investimento Imobiliário")
 
 
-@app.route('/cripto')
+@app.route("/cripto")
 def cripto():
-    app.logger.info('%s %s %s %s', request.remote_addr, request.method, request.scheme, request.full_path)
     parametros_endpoint()
-    return render_template('lista.html', titulo="Cripto")
+    return pagina_ou_erro("Cripto")
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0") #, port=5001 #se quiser mudar a porta
+    app.run(host="0.0.0.0")
